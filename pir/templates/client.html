@@ -1,0 +1,114 @@
+
+# select 2 prime numbers with k/2 bits and multiply them
+
+
+# select t numbers that y(i) is QNR and other is QR (i is the col that expected)
+
+# send t numbers to db
+
+# receive s numbers z(i) from databases
+
+# calculate the bit from z(i) that received from db
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/0.7.3/forge.min.js"></script>
+    <script src="http://peterolson.github.com/BigInteger.js/BigInteger.min.js"></script>
+    <title>Test</title>
+</head>
+<body>
+    
+</body>
+<script>
+//window.alert(1);
+var a = 1;
+//window.alert(typeof a);
+function jacobi(a, b) {
+    //if (b <= 0 || b % 2 === 0) return 0;
+    if (b.leq(0) || b.mod(2).eq(0)) return 0;
+    var j = 1;
+    //if (a < 0) {
+    if (a.lt(0)) {
+        a = bigInt(-a);
+        //if (b % 4 === 3)
+        if (b.mod(4).eq(3))
+            j = -j;
+    }
+    //while (a !== 0) {
+    while (!a.isZero()) {
+        //while (a % 2 === 0) {
+        while (a.mod(2).isZero()) {
+         /* Process factors of 2: Jacobi(2,b)=-1 if b=3,5 (mod 8) */
+            //a = new Number(a/2);
+            a = a.divide(2);
+            //if ((b % 8 === 3) || (b % 8 === 5)) j = new Number(-j);
+            if (b.mod(8).eq(3) || b.mod(8).eq(5))
+                j = -j;
+        }
+        /* Quadratic reciprocity: Jacobi(a,b)=-Jacobi(b,a) if a=3,b=3 (mod 4) */
+        //interchange(a,b);
+        var tmp = b;
+        b = a;
+        a = tmp;
+        //if (a % 4 === 3 && b % 4 === 3) j = -j;
+        if (a.mod(4).eq(3) && b.mod(4).eq(3)) j = -j;
+        //a = new Number(a % b);
+        a = a.mod(b);
+    }
+    if (b.eq(1)) return j;
+    else return 0;
+}
+var n1, n2, numqnr = bigInt(0);
+forge.prime.generateProbablePrime(256, function(err, num) {
+    //window.alert("typeof num = " + typeof (num));
+    n1 = bigInt(num.toString(16), 16);
+    //window.alert("typeof n1 = " + typeof (n1));
+    forge.prime.generateProbablePrime(256, function(err, num) {
+        //window.alert('random prime ' + num.toString(16));
+        n2 = bigInt(num.toString(16),16);
+        var N = n1.multiply(n2);
+        //window.alert("typeof N = " + typeof (N));
+        //window.alert("N = " + N.toString(16));
+        var count1 = 0, data_count = 5, data_get = 2, numqnr = bigInt(0);
+        var setplusqr = new Array();
+        while (count1 < data_count) {
+            //window.alert("count 1 = " + count1);
+            if (count1 === data_get) {
+                //window.alert("condition 0");
+                setplusqr.push(bigInt(0));
+                count1 += 1;
+                continue;
+            }
+            //var num = Math.floor(Math.random() * (N-1)) + 1;
+            var num = bigInt.randBetween(1, N-1);
+            if (setplusqr.indexOf(num) !== -1) {
+                //window.alert("condition 1");
+                continue;
+            }
+            //window.alert("jacobi = " + jacobi(num,N));
+            if (jacobi(num,N) === 1) {
+                //window.alert("condition 2");
+                if (jacobi(num,n1) === 1 && jacobi(num, n2) === 1) {
+                    setplusqr.push(bigInt(num));
+                    count1 += 1;
+                }
+                else {
+                    if (numqnr.eq(0)) {
+                        numqnr = bigInt(num);
+                    }
+                }
+            }
+        }
+        var y = setplusqr;
+        y[data_get] = numqnr;
+        window.alert(y);
+        //var http = new XMLHttpRequest();
+        //var url = "post_data.php";
+    });
+});
+
+//window.alert(jacobi(6,11));
+</script>
+</html>

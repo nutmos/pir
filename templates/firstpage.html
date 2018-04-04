@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/0.7.3/forge.min.js"></script>
+    <script src="http://peterolson.github.com/BigInteger.js/BigInteger.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css">
+    <title>Test</title>
+</head>
+<body>
+    <div class="row text-center">
+        <div class="col-md"></div>
+        <div class="col-md-5">
+            <!--<button type="button" class="btn btn-primary disabled" id="send-btn" onclick="generatePrime()">Send</button>-->
+            <div class="input-group mb-3" style="margin-top: 50px">
+                <input id="ticker-input" type="text" class="form-control" placeholder="Stock Ticker" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary disabled" id="send-btn" type="button" onclick="generatePrime()">Find</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md"></div>
+    </div>
+    <div id="chart_div" style="width: 100%; height: 500px;"></div>
+</body>
+<script>
+var send_data = {
+    jacobi: function(a, b) {
+        if (b.leq(0) || b.mod(2).eq(0)) return 0;
+        var j = 1;
+        if (a.lt(0)) {
+            a = bigInt(-a);
+            if (b.mod(4).eq(3))
+                j = -j;
+        }
+        while (!a.isZero()) {
+            while (a.mod(2).isZero()) {
+             /* Process factors of 2: Jacobi(2,b)=-1 if b=3,5 (mod 8) */
+                a = a.divide(2);
+                if (b.mod(8).eq(3) || b.mod(8).eq(5))
+                    j = -j;
+            }
+            /* Quadratic reciprocity: Jacobi(a,b)=-Jacobi(b,a) if a=3,b=3 (mod 4) */
+            var tmp = b;
+            b = a;
+            a = tmp;
+            if (a.mod(4).eq(3) && b.mod(4).eq(3)) j = -j;
+            a = a.mod(b);
+        }
+        if (b.eq(1)) return j;
+        else return 0;
+    },
+    generatePrime: function(key_arr, key, kbits, url, method, stateChangeFunction) {
+        var n1, n2, numqnr = bigInt(0);
+        forge.prime.generateProbablePrime(kbits/2, function(err, num) {
+            n1 = bigInt(num.toString(16), 16);
+            forge.prime.generateProbablePrime(kbits/2, function(err, num) {
+                n2 = bigInt(num.toString(16),16);
+                var N = n1.multiply(n2);
+                var count1 = 0, numqnr = bigInt(0);
+                var setplusqr = {};
+                //var get_data = document.getElementById('ticker-input').value;
+                var get_data = key;
+                var tickers_arr = key_arr;
+                if (!tickers_arr.includes(get_data)) {
+                    window.alert("Stock not found! Please enter the new one.");
+                    return;
+                }
+                for (var k in tickers_arr) {
+                    if (tickers_arr[k] === get_data) continue;
+                    while (true) {
+                        var num = bigInt.randBetween(1, N-1);
+                        if (send_data.jacobi(num,N) === 1) {
+                            if (send_data.jacobi(num,n1) === 1 && send_data.jacobi(num, n2) === 1) {
+                                setplusqr[tickers_arr[k]] = num.toString(16);
+                                break;
+                            }
+                            else {
+                                if (numqnr.eq(0)) {
+                                    numqnr = bigInt(num);
+                                }
+                            }
+                        }
+                    }
+                }
+                var y = setplusqr;
+                if (numqnr.eq(0)) {
+                    while (true) {
+                        var num = bigInt.randBetween(1, N-1);
+                        if (send_data.jacobi(num,N) === 1) {
+                            if (!(send_data.jacobi(num,n1) === 1 && send_data.jacobi(num,n2) === 1)) {
+                                numqnr = bigInt(num);
+                                break;
+                            }
+                        }
+                    }
+                }
+                y[get_data] = numqnr.toString(16);
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open(method, url, true);
+                xmlHttp.onreadystatechange = stateChangeFunction;
+                var sendStr = JSON.stringify({"number": N, "y": y});
+                //window.alert(sendStr)
+                xmlHttp.send(sendStr);
+                //var csrftoken = Cookies.get('csrftoken');
+            });
+        });
+    }
+}
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+
+function drawChart(price_arr, ticker) {
+    var data = google.visualization.arrayToDataTable(price_arr);
+
+    var options = {
+        title: ticker + " Price (Baht)",
+        hAxis: {title: 'Date',  titleTextStyle: {color: '#333'}},
+        vAxis: {minValue: 0}
+    };
+    var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+}
+//window.alert(1);
+var a = 1;
+//window.alert(typeof a);
+
+var tickers_arr = new Array();
+
+document.addEventListener('DOMContentLoaded', function() {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open('GET', '/get-ticker', true);
+    xmlHttp.onreadystatechange = function() {
+        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+            tickers_arr = JSON.parse(this.responseText);
+            //window.alert(tickers_arr);
+            document.getElementById('send-btn').classList.remove('disabled');
+        }
+    }
+    xmlHttp.send();
+}, false);
+
+function generatePrime() {
+    send_data.generatePrime(tickers_arr, document.getElementById('ticker-input').value, 256, '/process/', 'POST', function() {
+            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                // Typical action to be performed when the document is ready:
+                //document.getElementById("demo").innerHTML = xhttp.responseText;
+                var response_data = JSON.parse(this.responseText);
+                //window.alert(response_data);
+                var data_tmp = "", count2 = 0, data_arr = new Array(), data_str = "";
+                for (i in response_data) {
+                    var num_i = bigInt(response_data[i], 16);
+                    if (send_data.jacobi(num_i, n1) === 1 && send_data.jacobi(num_i, n2) === 1) data_tmp += "0";
+                    else data_tmp += "1";
+                    count2 += 1;
+                    //if (count2 === 40) {
+                    if (count2 === 7) {
+                        count2 = 0;
+                        var char_tmp = String.fromCharCode(parseInt(data_tmp, 2));
+                        if (char_tmp === '\0') break;
+                        data_str += char_tmp;
+                        //window.alert(data_tmp)
+                        data_tmp = "";
+                        //var tmp_val = parseInt(data_tmp, 2);
+                        //if (tmp_val === 0) break;
+                        //else data_arr.push(tmp_val);
+                        //data_tmp = "";
+                    }
+                }
+                //window.alert(data_str);
+                //window.alert(data_str.length);
+                data_arr = JSON.parse(data_str)
+                var data_new = [['Date', 'Price']];
+                for (var i in data_arr) {
+                    data_new.push([i, parseInt(data_arr[i])/100]);
+                }
+                drawChart(data_new, get_data);
+            }
+        });
+}
+</script>
+</html>
