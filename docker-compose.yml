@@ -5,7 +5,7 @@ services:
     image: mysql
   web:
     build: .
-    command: python3 manage.py runserver
+    command: "python3 manage.py runserver"
     volumes:
       - .:/code
     ports:

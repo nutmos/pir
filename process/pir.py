@@ -1,8 +1,8 @@
 # data is the dictionary with format
-# key is the value of data
+# key is the column (or key) of data
 # value is the dictionary with format:
-# key: y value: QR, QNR number in base 16 format string
-# key: data value: the data string to encode
+# key: y, value: QR, QNR number in base 16 format string
+# key: data, value: the data string to encode
 # N is the modulus value
 # k is the bits of N (key)
 # return data is array of z that contains array of base 16 number in string format

@@ -24,7 +24,7 @@ var private_ir = {
         if (b.eq(1)) return j;
         else return 0;
     },
-    generatePrime: function(key_arr, key, kbits, url, method, retrieveDataFunction) {
+    generatePrime: function(key_arr, key, kbits, url, method, errorMessage, retrieveDataFunction) {
         var n1, n2, numqnr = bigInt(0);
         forge.prime.generateProbablePrime(kbits/2, function(err, num) {
             n1 = bigInt(num.toString(16), 16);
@@ -32,7 +32,7 @@ var private_ir = {
                 n2 = bigInt(num.toString(16),16);
                 var N = n1.multiply(n2), count1 = 0, numqnr = bigInt(0), setplusqr = {}, get_data = key, tickers_arr = key_arr;
                 if (!tickers_arr.includes(get_data)) {
-                    window.alert("Stock not found! Please enter the new one.");
+                    window.alert(errorMessage);
                     return;
                 }
                 for (var k in tickers_arr) {
