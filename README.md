@@ -4,9 +4,18 @@ This project is made by Nattapong Ekudomsuk
 
 ## How to run
 
-### Directly
+### Launch MySQL
 
-### Docker
+```> cd /Library/LaunchDaemons
+> sudo launchctl load -F com.oracle.oss.mysql.mysqld.plist```
+
+### Launch Django Server
+
+#### Directly
+
+```> python3 manage.py runserver```
+
+#### Docker
 
 Build this image using Docker. First, change the directory to django application root path. Now build the Docker image using this command
 

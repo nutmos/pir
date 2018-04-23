@@ -20,7 +20,7 @@ def insert_data(request):
         start = date(end.year-1, end.month, end.day)
         ms = pdr.mstar.daily.MorningstarDailyReader('XBKK:'+ticker, start=start, end=end)
         price_close_data = ms.read().Close.tolist()
-        price_close_str = list(map(lambda x: str(int(x*100)), price_close_data))
+        price_close_str = list(map(lambda x: str(int(x)), price_close_data))
         #x = db.curser()
         #x.execute("""INSERT INTO Stock_Price (ticker, price) VALUES (%s,%s)""",(ticker, price_close_str))
         #if Stock_Price.objects.raw('SELECT * FROM Stock_Price WHERE ticker=%s' % (ticker, )) != None:
