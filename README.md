@@ -6,8 +6,13 @@ This project is made by Nattapong Ekudomsuk
 
 ### Launch MySQL
 
-```> cd /Library/LaunchDaemons
-> sudo launchctl load -F com.oracle.oss.mysql.mysqld.plist```
+Change directory to mysqld proecess
+
+```> cd /Library/LaunchDaemons```
+
+Run process on Mac using launchctl
+
+```> sudo launchctl load -F com.oracle.oss.mysql.mysqld.plist```
 
 ### Launch Django Server
 
