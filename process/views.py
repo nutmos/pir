@@ -45,11 +45,11 @@ def insert_data():
     return HttpResponse("Completed")
     #return HttpResponse("Fail")
 
-def insert_data2():
+def insert_data2(file_path, prefix):
     import pandas_datareader as pdr
     #ticker = request.GET['ticker']
     #print (ticker)
-    with open('snp500-clean.json', 'r') as file1:
+    with open(file_path, 'r') as file1:
         ticker_arr = json.load(file1)
     for ticker in ticker_arr:
         end = date.today()
@@ -63,7 +63,7 @@ def insert_data2():
         #x = db.curser()
         #x.execute("""INSERT INTO Stock_Price (ticker, price) VALUES (%s,%s)""",(ticker, price_close_str))
         #if Stock_Price.objects.raw('SELECT * FROM Stock_Price WHERE ticker=%s' % (ticker, )) != None:
-        ticker = 'US:'+ticker
+        ticker = prefix+':'+ticker
         check_in_db = Stock_Price.objects.filter(ticker=ticker)
         if check_in_db.exists():
             for i in check_in_db:
