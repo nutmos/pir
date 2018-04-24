@@ -8,7 +8,7 @@ import MySQLdb
 import threading
 import time
 import math
-import thread
+import _thread
 import process.pir as pir_lib
 # Create your views here.
 
