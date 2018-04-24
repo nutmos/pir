@@ -30,7 +30,7 @@ def insert_data(request):
                 print (i.id)
             i.price = price_close_str
             i.save()
-            return HttpResponse("Data exists")
+            return HttpResponse("Update existing data completed.")
         else:
             p = Stock_Price(ticker=ticker, price=price_close_str)
             p.save()
@@ -71,6 +71,14 @@ def calculate_pir(request):
         data[p.ticker] = {'y': y[p.ticker], 'data': json.dumps(p.price)}
     z_data_int = pir_lib.calculate_pir(data, N, 256)
     return HttpResponse(z_data_int, content_type="application/json")
+
+@csrf_exempt
+def non_pir(request):
+    data = Stock_Price.objects.all()
+    max_bin_digits = 40
+    price_list = list(data)
+    request_body = json.loads(request.body.decode('utf-8'))
+    return HttpResponse(json.dumps(price_list), content_type='application/json')
 
 def calculate_pir_1(request):
     from timeit import default_timer as timer

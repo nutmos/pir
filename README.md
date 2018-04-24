@@ -13,6 +13,7 @@ Change directory to mysqld proecess
 Run process on Mac using launchctl
 
 ```> sudo launchctl load -F com.oracle.oss.mysql.mysqld.plist```
+```> mysql.server start```
 
 ### Launch Django Server
 

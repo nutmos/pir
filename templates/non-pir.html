@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/0.7.3/forge.min.js"></script>
+    <script src="http://peterolson.github.com/BigInteger.js/BigInteger.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css">
+    <title>Test</title>
+</head>
+<body>
+    <div class="row text-center">
+        <div class="col-md"></div>
+        <div class="col-md-5">
+            <!--<button type="button" class="btn btn-primary disabled" id="send-btn" onclick="generatePrime()">Send</button>-->
+            <div class="input-group mb-3" style="margin-top: 50px">
+                <input id="ticker-input" type="text" class="form-control" placeholder="Stock Ticker" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary disabled" id="send-btn" type="button" onclick="generatePrime()">Find</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md"></div>
+    </div>
+    <div id="chart_div" style="width: 100%; height: 500px;"></div>
+</body>
+<script>
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+
+function drawChart(price_arr, ticker) {
+    var data = google.visualization.arrayToDataTable(price_arr);
+
+    var options = {
+        title: ticker + " Price (Baht)",
+        hAxis: {title: 'Date',  titleTextStyle: {color: '#333'}},
+        vAxis: {minValue: 0}
+    };
+    var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+}
+//window.alert(1);
+var a = 1;
+//window.alert(typeof a);
+
+var tickers_arr = new Array();
+
+document.addEventListener('DOMContentLoaded', function() {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open('GET', '/get-ticker', true);
+    xmlHttp.onreadystatechange = function() {
+        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+            tickers_arr = JSON.parse(this.responseText);
+            //window.alert(tickers_arr);
+            document.getElementById('send-btn').classList.remove('disabled');
+        }
+    }
+    xmlHttp.send();
+}, false);
+
+
+function generatePrime() {
+    var ticker_get = document.getElementById('ticker-input').value;
+    var xmlHttp = XMLHTTPRequest();
+    xmlHttp.open('GET', '/process-1/', true);
+    xmlHttp.onreadystatechange = function() {
+        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+            var response_data = JSON.parse(this.responseText);
+            response_data = response_data[ticker_get]
+            var data_new = [['Date', 'Price']];
+            for (var i in response_data) {
+                data_new.push([i, parseInt(data_arr[i])]);
+            }
+            drawChart(data_new, ticker_get);
+        }
+    }
+    xmlHttp.send()
+}
+</script>
+</html>
