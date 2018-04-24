@@ -52,7 +52,7 @@ def thread_func(ms_ticker, store_ticker):
     try:
         price_close_data = ms.read().Close.tolist()
     except:
-        continue
+        return
     price_close_str = list(map(lambda x: str(float(x)), price_close_data))
     #x = db.curser()
     #x.execute("""INSERT INTO Stock_Price (ticker, price) VALUES (%s,%s)""",(ticker, price_close_str))
