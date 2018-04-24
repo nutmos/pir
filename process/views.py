@@ -89,7 +89,6 @@ def insert_data2(file_path, prefix='', ms_prefix='', start_at=None):
         store_ticker = ticker
         if prefix != '': store_ticker = prefix+":"+ticker
         thread.start_new_thread(thread_func, (ms_ticker, store_ticker,))
-    import pandas_datareader as pdr
         time.sleep(0.2)
     return HttpResponse("Completed")
     #return HttpResponse("Fail")
