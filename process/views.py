@@ -45,7 +45,35 @@ def insert_data():
     return HttpResponse("Completed")
     #return HttpResponse("Fail")
 
-def insert_data2(file_path, prefix, start_at=None):
+def thread_func(ms_ticker, store_ticker):
+    end = date.today()
+    start = date(end.year-1, end.month, end.day)
+    ms = pdr.mstar.daily.MorningstarDailyReader(ms_ticker, start=start, end=end, timeout=5, retry_count=0)
+    try:
+        price_close_data = ms.read().Close.tolist()
+    except:
+        continue
+    price_close_str = list(map(lambda x: str(float(x)), price_close_data))
+    #x = db.curser()
+    #x.execute("""INSERT INTO Stock_Price (ticker, price) VALUES (%s,%s)""",(ticker, price_close_str))
+    #if Stock_Price.objects.raw('SELECT * FROM Stock_Price WHERE ticker=%s' % (ticker, )) != None:
+    ticker = prefix+':'+ticker
+    check_in_db = Stock_Price.objects.filter(ticker=ticker)
+    if check_in_db.exists():
+        for i in check_in_db:
+            #print (i.id)
+            i.price = price_close_str
+            i.save()
+            print (ticker)
+        #return HttpResponse("Update existing data completed.")
+    else:
+        p = Stock_Price(ticker=ticker, price=price_close_str)
+        p.save()
+        print (ticker)
+    #print (price_close_data)
+    
+
+def insert_data2(file_path, prefix='', ms_prefix='', start_at=None):
     import pandas_datareader as pdr
     #ticker = request.GET['ticker']
     #print (ticker)
@@ -56,31 +84,11 @@ def insert_data2(file_path, prefix, start_at=None):
             start_index = ticker_arr.index(start_at)
             ticker_arr = ticker_arr[start_index:]
     for ticker in ticker_arr:
-        end = date.today()
-        start = date(end.year-1, end.month, end.day)
-        ms = pdr.mstar.daily.MorningstarDailyReader(ticker, start=start, end=end, timeout=5, retry_count=0)
-        try:
-            price_close_data = ms.read().Close.tolist()
-        except:
-            continue
-        price_close_str = list(map(lambda x: str(float(x)), price_close_data))
-        #x = db.curser()
-        #x.execute("""INSERT INTO Stock_Price (ticker, price) VALUES (%s,%s)""",(ticker, price_close_str))
-        #if Stock_Price.objects.raw('SELECT * FROM Stock_Price WHERE ticker=%s' % (ticker, )) != None:
-        ticker = prefix+':'+ticker
-        check_in_db = Stock_Price.objects.filter(ticker=ticker)
-        if check_in_db.exists():
-            for i in check_in_db:
-                #print (i.id)
-                i.price = price_close_str
-                i.save()
-                print (ticker)
-            #return HttpResponse("Update existing data completed.")
-        else:
-            p = Stock_Price(ticker=ticker, price=price_close_str)
-            p.save()
-            print (ticker)
-        #print (price_close_data)
+        ms_ticker = ticker
+        if ms_prefix != '': ms_ticker = ms_prefix+':'+ticker
+        store_ticker = ticker
+        if prefix != '': store_ticker = prefix+":"+ticker
+        thread.start_new_thread(thread_func, (ms_ticker, store_ticker,))
     return HttpResponse("Completed")
     #return HttpResponse("Fail")
 
