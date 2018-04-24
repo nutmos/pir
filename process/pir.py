@@ -41,7 +41,7 @@ def calculate_pir(data, N, k):
     for key,val in data.items():
         data_len = len(val['data'])
         if data_len > max_length: max_length = data_len
-    number_of_thread = 9
+    number_of_thread = 49
     z_data = [1] * (max_length * k * 7)
     #print (max_length)
     if max_length % number_of_thread != 0: number_of_thread += 1
