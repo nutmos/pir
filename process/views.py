@@ -45,12 +45,16 @@ def insert_data():
     return HttpResponse("Completed")
     #return HttpResponse("Fail")
 
-def insert_data2(file_path, prefix):
+def insert_data2(file_path, prefix, start_at=None):
     import pandas_datareader as pdr
     #ticker = request.GET['ticker']
     #print (ticker)
     with open(file_path, 'r') as file1:
         ticker_arr = json.load(file1)
+    if start_at != None:
+        if start_at in ticker_arr:
+            start_index = ticker_arr.index(start_at)
+            ticker_arr = ticker_arr[start_index:]
     for ticker in ticker_arr:
         end = date.today()
         start = date(end.year-1, end.month, end.day)
