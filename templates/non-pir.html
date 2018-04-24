@@ -70,7 +70,7 @@ function generatePrime() {
             data_arr = response_data[ticker_get]
             var data_new = [['Date', 'Price']];
             for (var i in data_arr) {
-                data_new.push([i, parseInt(data_arr[i])]);
+                data_new.push([i, parseFloat(data_arr[i])]);
             }
             drawChart(data_new, ticker_get);
         }
