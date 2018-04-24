@@ -11,9 +11,9 @@ import math
 import _thread as thread
 import process.pir as pir_lib
 # Create your views here.
+import pandas_datareader as pdr
 
 def insert_data():
-    import pandas_datareader as pdr
     #ticker = request.GET['ticker']
     #print (ticker)
     with open('stocks-thai.json', 'r') as file1:
@@ -75,7 +75,6 @@ def thread_func(ms_ticker, store_ticker):
     
 
 def insert_data2(file_path, prefix='', ms_prefix='', start_at=None):
-    import pandas_datareader as pdr
     #ticker = request.GET['ticker']
     #print (ticker)
     with open(file_path, 'r') as file1:
