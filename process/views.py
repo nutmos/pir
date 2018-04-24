@@ -45,6 +45,41 @@ def insert_data():
     return HttpResponse("Completed")
     #return HttpResponse("Fail")
 
+def insert_data2():
+    import pandas_datareader as pdr
+    #ticker = request.GET['ticker']
+    #print (ticker)
+    with open('snp500-clean.json', 'r') as file1:
+        ticker_arr = json.load(file1)
+    for ticker in ticker_arr:
+        end = date.today()
+        start = date(end.year-1, end.month, end.day)
+        ms = pdr.mstar.daily.MorningstarDailyReader(ticker, start=start, end=end, timeout=5, retry_count=0)
+        try:
+            price_close_data = ms.read().Close.tolist()
+        except:
+            continue
+        price_close_str = list(map(lambda x: str(float(x)), price_close_data))
+        #x = db.curser()
+        #x.execute("""INSERT INTO Stock_Price (ticker, price) VALUES (%s,%s)""",(ticker, price_close_str))
+        #if Stock_Price.objects.raw('SELECT * FROM Stock_Price WHERE ticker=%s' % (ticker, )) != None:
+        ticker = 'US:'+ticker
+        check_in_db = Stock_Price.objects.filter(ticker=ticker)
+        if check_in_db.exists():
+            for i in check_in_db:
+                #print (i.id)
+                i.price = price_close_str
+                i.save()
+                print (ticker)
+            #return HttpResponse("Update existing data completed.")
+        else:
+            p = Stock_Price(ticker=ticker, price=price_close_str)
+            p.save()
+            print (ticker)
+        #print (price_close_data)
+    return HttpResponse("Completed")
+    #return HttpResponse("Fail")
+
 def calculate_z(price_arr, y_data, N, z_data, max_bin_digits, price_seq, price_per_thread):
     i = 0
     while i < price_per_thread:
