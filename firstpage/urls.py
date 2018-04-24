@@ -19,5 +19,6 @@ from . import views
 
 urlpatterns = [
     path('get-ticker/', views.get_ticker),
+    path('non-pir/', views.non_pir),
     path(r'', views.firstpage),
 ]

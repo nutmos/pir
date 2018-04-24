@@ -62,14 +62,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function generatePrime() {
     var ticker_get = document.getElementById('ticker-input').value;
-    var xmlHttp = XMLHTTPRequest();
-    xmlHttp.open('GET', '/process-1/', true);
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open('GET', '/process/non-pir', true);
     xmlHttp.onreadystatechange = function() {
         if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
             var response_data = JSON.parse(this.responseText);
-            response_data = response_data[ticker_get]
+            data_arr = response_data[ticker_get]
             var data_new = [['Date', 'Price']];
-            for (var i in response_data) {
+            for (var i in data_arr) {
                 data_new.push([i, parseInt(data_arr[i])]);
             }
             drawChart(data_new, ticker_get);

@@ -77,8 +77,10 @@ def non_pir(request):
     data = Stock_Price.objects.all()
     max_bin_digits = 40
     price_list = list(data)
-    request_body = json.loads(request.body.decode('utf-8'))
-    return HttpResponse(json.dumps(price_list), content_type='application/json')
+    new_price_list = {}
+    for p in price_list:
+        new_price_list[p.ticker] = p.price
+    return HttpResponse(json.dumps(new_price_list), content_type='application/json')
 
 def calculate_pir_1(request):
     from timeit import default_timer as timer
