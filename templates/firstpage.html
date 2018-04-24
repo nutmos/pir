@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function generatePrime() {
     var ticker_get = document.getElementById('ticker-input').value;
-    private_ir.generatePrime(tickers_arr, ticker_get, 128, '/process/', 'POST', "Stock not found! Please enter the new one.", function(data_arr_json) {
+    private_ir.generatePrime(tickers_arr, ticker_get, 16, '/process/', 'POST', "Stock not found! Please enter the new one.", function(data_arr_json) {
         var data_arr = JSON.parse(data_arr_json);
         var data_new = [['Date', 'Price']];
         for (var i in data_arr) {

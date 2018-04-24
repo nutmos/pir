@@ -76,7 +76,7 @@ def calculate_pir(request):
     data = {}
     for p in price_list:
         data[p.ticker] = {'y': y[p.ticker], 'data': json.dumps(p.price)}
-    z_data_int = pir_lib.calculate_pir(data, N, 256)
+    z_data_int = pir_lib.calculate_pir(data, N, 16)
     return HttpResponse(z_data_int, content_type="application/json")
 
 @csrf_exempt
