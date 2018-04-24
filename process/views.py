@@ -46,7 +46,7 @@ def insert_data():
     return HttpResponse("Completed")
     #return HttpResponse("Fail")
 
-def thread_func(ms_ticker, store_ticker):
+def thread_func(ms_ticker, ticker):
     end = date.today()
     start = date(end.year-1, end.month, end.day)
     ms = pdr.mstar.daily.MorningstarDailyReader(ms_ticker, start=start, end=end, timeout=5, retry_count=0)
@@ -58,7 +58,7 @@ def thread_func(ms_ticker, store_ticker):
     #x = db.curser()
     #x.execute("""INSERT INTO Stock_Price (ticker, price) VALUES (%s,%s)""",(ticker, price_close_str))
     #if Stock_Price.objects.raw('SELECT * FROM Stock_Price WHERE ticker=%s' % (ticker, )) != None:
-    ticker = prefix+':'+ticker
+    #ticker = prefix+':'+ticker
     check_in_db = Stock_Price.objects.filter(ticker=ticker)
     if check_in_db.exists():
         for i in check_in_db:
