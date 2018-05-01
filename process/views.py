@@ -115,6 +115,7 @@ def calculate_z(price_arr, y_data, N, z_data, max_bin_digits, price_seq, price_p
 
 @csrf_exempt
 def calculate_pir(request):
+    print (request.META["CONTENT_LENGTH"])
     data = Stock_Price.objects.all()
     max_bin_digits = 40
     price_list = list(data)
@@ -125,7 +126,7 @@ def calculate_pir(request):
     for p in price_list:
         data[p.ticker] = {'y': y[p.ticker], 'data': json.dumps(p.price)}
     z_data_int = pir_lib.calculate_pir(data, N, 8)
-    print(len(z_data_int))
+    #print (len(z_data_int))
     return HttpResponse(z_data_int, content_type="application/json")
 
 @csrf_exempt
@@ -136,7 +137,6 @@ def non_pir(request):
     new_price_list = {}
     for p in price_list:
         new_price_list[p.ticker] = p.price
-    print(len(json.dumps(new_price_list)))
     return HttpResponse(json.dumps(new_price_list), content_type='application/json')
 
 def calculate_pir_1(request):
