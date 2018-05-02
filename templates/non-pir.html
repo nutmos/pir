@@ -76,10 +76,10 @@ function generatePrime() {
             }
             drawChart(data_new, ticker_get);
         }
+        var endTime = new Date();
+        document.getElementById('time-div').innerHTML = Math.round(endTime - startTime)/1000;
     }
     xmlHttp.send()
-    var endTime = new Date();
-    document.getElementById('time-div').innerHTML = Math.round(endTime - startTime)/1000;
 }
 </script>
 </html>
